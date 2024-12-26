@@ -1,6 +1,7 @@
 let currentSong = new Audio();
 let songs;
 let currFolder;
+console.log("js chl rha h")
 
 //function to convert seconds in mm:ss format
 function formatTime(seconds) {
@@ -26,7 +27,7 @@ function formatTime(seconds) {
 
 async function getSongs(folder) {
     currFolder = folder;
-    let a = await fetch(`http://127.0.0.1:5500/${currFolder}/`)
+    let a = await fetch(`/${currFolder}/`)
     let response = await a.text();
 
     let div = document.createElement("div")
@@ -37,9 +38,9 @@ async function getSongs(folder) {
         const element = as[index];
         if (element.href.endsWith(".mp3")) {
             songs.push(element.href.split(`/${currFolder}/`)[1])
+            // console.log(songs)
         }
     }
-
 
     //show all songs in the playlist
     let songUL = document.querySelector(".songList").getElementsByTagName("ul")[0]
@@ -81,7 +82,8 @@ const playMusic = (track, pause = false) => {
 }
 
 async function displayAlbums() {
-    let a = await fetch(`http://127.0.0.1:5500/songs/`)
+    
+    let a = await fetch(`/songs/`)
     let response = await a.text();
 
     let div = document.createElement("div")
@@ -94,10 +96,13 @@ async function displayAlbums() {
 
         //Create album cards
         if (e.href.includes("/songs/")) {
-            let folder = e.href.split("/").slice(-1)[0]
+            let folder = e.href.split("/")[4]
+            // console.log(folder)
+            // let folder = e.href.split("/").slice(-1)[0]
             //Get meta data of the folder
-            let a = await fetch(`http://127.0.0.1:5500/songs/${folder}/info.json`);
+            let a = await fetch(`/songs/${folder}/info.json`);
             let response = await a.json();
+            console.log(response)
             cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card">
                             <div class="play">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 100 100">
@@ -130,6 +135,8 @@ async function displayAlbums() {
 
 
 async function main() {
+
+    
 
     await getSongs("songs/newSong");
     playMusic(songs[0], true)
