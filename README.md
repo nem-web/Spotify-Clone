@@ -90,4 +90,4 @@ All music and images belong to their respective owners.
 
 ---
 
-**GitHub Repository:**
+**GitHub Repository:** [github.com/nem-web/Spotify-Clone](https://github.com/nem-web/Spotify-Clone)
