@@ -1,4 +1,4 @@
-const BASE_URL = "https://cdn.jsdelivr.net/gh/nem-web/music-library@main/songs";
+const BASE_URL = "https://cdn.jsdelivr.net/gh/nem-web/music-library/songs";
 
 let currentSong = new Audio();
 let songs = [];
