@@ -1,3 +1,5 @@
+const BASE_URL = "https://cdn.jsdelivr.net/gh/nem-web/music-library@songs";
+
 let currentSong = new Audio();
 let songs = [];
 let currFolder = "";
@@ -5,7 +7,7 @@ const play = document.getElementById("play");
 const previous = document.getElementById("previous");
 const next = document.getElementById("next");
 
-// Format time in mm:ss
+// Format time
 function formatTime(seconds) {
     if (isNaN(seconds) || seconds < 0) return "00:00";
     const total = Math.round(seconds);
@@ -14,9 +16,9 @@ function formatTime(seconds) {
     return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
 }
 
-// Play music by track name
+// Play song
 const playMusic = (track, pause = false) => {
-    currentSong.src = `/${currFolder}/${track}`;
+    currentSong.src = `${BASE_URL}/${currFolder}/${track}`;
     if (!pause) {
         currentSong.pause();
         play.src = "img/playButton.png";
@@ -27,7 +29,7 @@ const playMusic = (track, pause = false) => {
     document.querySelector(".songTime").innerHTML = "00:00 / 00:00";
 };
 
-// Update song list in the left panel
+// Update left song list
 function updateSongListUI(songList) {
     let songUL = document.querySelector(".songList ul");
     songUL.innerHTML = "";
@@ -53,15 +55,14 @@ function updateSongListUI(songList) {
     });
 }
 
-// Display album cards dynamically
+// Display album cards
 async function displayAlbums() {
-    const response = await fetch("/songs/info.json");
+    const response = await fetch(`${BASE_URL}/info.json`);
     const data = await response.json();
     const cardContainer = document.querySelector(".cardContainer");
 
     for (let folder in data) {
         const album = data[folder];
-
         cardContainer.innerHTML += `
         <div data-folder="${folder}" class="card">
             <div class="play">
@@ -70,7 +71,7 @@ async function displayAlbums() {
                     <polygon points="40,30 70,50 40,70" fill="black" stroke="black" stroke-width="2" />
                 </svg>
             </div>
-            <img src="/songs/${folder}/cover.jpeg" alt="">
+            <img src="${BASE_URL}/${folder}/cover.jpeg" alt="">
             <h2>${album.title}</h2>
             <p>${album.description}</p>
         </div>`;
@@ -80,28 +81,17 @@ async function displayAlbums() {
         card.addEventListener("click", () => {
             const folder = card.dataset.folder;
             songs = data[folder].songs;
-            currFolder = `songs/${folder}`;
+            currFolder = folder;
             playMusic(songs[0], true);
             updateSongListUI(songs);
         });
     });
 }
 
-// Main function
+// Main
 async function main() {
     await displayAlbums();
 
-    // Default load first album (optional)
-    // Uncomment below if you want to preload:
-    // const defaultFolder = "Bhojpuri";
-    // const res = await fetch("/songs/info.json");
-    // const json = await res.json();
-    // songs = json[defaultFolder].songs;
-    // currFolder = `songs/${defaultFolder}`;
-    // playMusic(songs[0], true);
-    // updateSongListUI(songs);
-
-    // Play/pause button
     play.addEventListener("click", () => {
         if (currentSong.paused) {
             currentSong.play();
@@ -112,20 +102,17 @@ async function main() {
         }
     });
 
-    // Time update
     currentSong.addEventListener("timeupdate", () => {
         document.querySelector(".songTime").innerHTML = formatTime(currentSong.currentTime) + " / " + formatTime(currentSong.duration);
         document.querySelector(".circle").style.left = (currentSong.currentTime / currentSong.duration) * 100 + "%";
     });
 
-    // Seekbar click
     document.querySelector(".seekbar").addEventListener("click", (e) => {
         const percent = (e.offsetX / e.target.getBoundingClientRect().width) * 100;
         document.querySelector(".circle").style.left = percent + "%";
         currentSong.currentTime = (percent / 100) * currentSong.duration;
     });
 
-    // Hamburger open/close
     document.querySelector(".hamburger").addEventListener("click", () => {
         document.querySelector(".left").style.left = "0";
     });
@@ -133,7 +120,6 @@ async function main() {
         document.querySelector(".left").style.left = "-120%";
     });
 
-    // Previous/Next buttons
     previous.addEventListener("click", () => {
         const index = songs.indexOf(currentSong.src.split("/").pop());
         if (index > 0) playMusic(songs[index - 1]);
@@ -144,12 +130,10 @@ async function main() {
         if (index < songs.length - 1) playMusic(songs[index + 1]);
     });
 
-    // Volume control
     document.querySelector(".range input").addEventListener("change", (e) => {
         currentSong.volume = parseInt(e.target.value) / 100;
     });
 
-    // Mute/Unmute
     document.querySelector(".volume>img").addEventListener("click", (e) => {
         const img = e.target;
         if (img.src.includes("volume.svg")) {
