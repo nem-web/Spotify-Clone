@@ -11,12 +11,12 @@ function formatTime(seconds) {
     const total = Math.round(seconds);
     const minutes = Math.floor(total / 60);
     const remaining = total % 60;
-    return ${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')};
+    return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
 }
 
 // Play music by track name
 const playMusic = (track, pause = false) => {
-    currentSong.src = /${currFolder}/${track};
+    currentSong.src = `${currFolder}/${track}`;
     if (!pause) {
         currentSong.pause();
         play.src = "img/playButton.png";
@@ -32,7 +32,7 @@ function updateSongListUI(songList) {
     let songUL = document.querySelector(".songList ul");
     songUL.innerHTML = "";
     for (const song of songList) {
-        songUL.innerHTML += 
+        songUL.innerHTML += `
         <li>
             <img class="invert" src="img/music.png" alt="">
             <div class="info">
@@ -43,7 +43,7 @@ function updateSongListUI(songList) {
                 <span>Play Now</span>
                 <img class="invert" src="img/playButton.png" alt="">
             </div>
-        </li>;
+        </li>`;
     }
 
     document.querySelectorAll(".songList li").forEach((li, index) => {
@@ -62,7 +62,7 @@ async function displayAlbums() {
     for (let folder in data) {
         const album = data[folder];
 
-        cardContainer.innerHTML += 
+        cardContainer.innerHTML += `
         <div data-folder="${folder}" class="card">
             <div class="play">
                 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 100 100">
@@ -73,14 +73,14 @@ async function displayAlbums() {
             <img src="/songs/${folder}/cover.jpeg" alt="">
             <h2>${album.title}</h2>
             <p>${album.description}</p>
-        </div>;
+        </div>`;
     }
 
     document.querySelectorAll(".card").forEach((card) => {
         card.addEventListener("click", () => {
             const folder = card.dataset.folder;
             songs = data[folder].songs;
-            currFolder = songs/${folder};
+            currFolder = `/songs/${folder}`;
             playMusic(songs[0], true);
             updateSongListUI(songs);
         });
@@ -90,16 +90,6 @@ async function displayAlbums() {
 // Main function
 async function main() {
     await displayAlbums();
-
-    // Default load first album (optional)
-    // Uncomment below if you want to preload:
-    // const defaultFolder = "Bhojpuri";
-    // const res = await fetch("/songs/info.json");
-    // const json = await res.json();
-    // songs = json[defaultFolder].songs;
-    // currFolder = songs/${defaultFolder};
-    // playMusic(songs[0], true);
-    // updateSongListUI(songs);
 
     // Play/pause button
     play.addEventListener("click", () => {
